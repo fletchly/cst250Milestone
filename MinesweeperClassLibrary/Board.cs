@@ -85,13 +85,18 @@ public class Board
                 bombsPlaced++;
             }
         }
-
+        
         while (rewardsPlaced < RewardLimit)
         {
+            // Get a random location on the board
             row = random.Next(Size);
             column = random.Next(Size);
 
-            if (!Cells[row, column].HasSpecialReward)
+            // If a reward does not exist in the current location and
+            // the current cell is not a bomb, create a reward
+            // and increment the counter. Otherwise, do not increment the
+            // counter and attempt to place again.
+            if (!Cells[row, column].HasSpecialReward && !Cells[row,column].IsBomb)
             {
                 Cells[row, column].HasSpecialReward = true;
                 rewardsPlaced++;
@@ -216,15 +221,21 @@ public class Board
         return GameState.InProgress;
     }
 
+    /// <summary>
+    /// Method to control how rewards are colelcted
+    /// </summary>
+    /// <param name="row"></param>
+    /// <param name="col"></param>
+    /// <returns></returns>
     public bool UseSpecialBonus(int row, int col)
     {
+        // If the cell is uncovered and has a reward, collect it.
         if (Cells[row, col].HasSpecialReward && Cells[row, col].IsVisited)
         {
             Cells[row, col].HasSpecialReward = false;
             Rewards++;
             return true;
         }
-
         return false;
     }
 
