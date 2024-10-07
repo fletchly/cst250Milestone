@@ -9,6 +9,12 @@ namespace MinesweeperClassLibrary;
 
 public class Board
 {
+    public int Size { get; set; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public Cell[,] Cells { get; set; }
+    public int Difficulty { get; set; }
+    public int Rewards { get; set; }
     public enum GameState
     {
         PreStart,
@@ -17,6 +23,7 @@ public class Board
         Won,
         Lost
     }
+    public List<(int, int)> BombLocations { get; set; }
 
     public Board(int size, int difficulty)
     {
@@ -32,23 +39,16 @@ public class Board
         Rewards = 0;
 
         Cells = new Cell[size, size];
+        BombLocations = new List<(int, int)>();
 
         // Load Board with Cells
         for (var row = 0; row < Size; row++)
         for (var col = 0; col < Size; col++)
             Cells[row, col] = new Cell(row, col);
-
+        
         // Setup bombs
         SetupBombs();
     }
-
-    public int Size { get; set; }
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
-    public Cell[,] Cells { get; set; }
-    public int Difficulty { get; set; }
-
-    public int Rewards { get; set; }
 
     /// <summary>
     ///     Initialize game board with bombs
@@ -74,6 +74,7 @@ public class Board
             {
                 Cells[row, column].IsBomb = true;
                 CalculateNeighbors(row, column);
+                BombLocations.Add((row, column));
                 bombsPlaced++;
             }
         }
@@ -120,14 +121,77 @@ public class Board
     {
         return row >= 0 && column >= 0 && row < Size && column < Size;
     }
-
-    // Method to be implemented in future milestone
-    public void DetermineGameState()
+    
+    /// <summary>
+    /// Determine the state of game and return it.
+    /// </summary>
+    /// <returns></returns>
+    public GameState DetermineGameState()
     {
+        // Declare and initialize
+        bool allNonBombsVisited = true; // Assume that all non bombs have been visited by default
+        bool allBombsFlagged = true; // Assume that all bombs have been flagged by default
+        bool hasUnvisitedCells = false; // Assume that all cells have been visited by default
+        
+        
+        // Iterate over every cell in the board
+        foreach (var cell in Cells)
+        {
+            // If a bomb has been visited
+            if (cell.IsVisited && cell.IsBomb)
+            {
+                return GameState.Lost;
+            }
+            
+            // If there exists a cell that is not a bomb and
+            // has not been visited, we know that all
+            // non-bombs have not been visited, which invalidates
+            // one leg of our win condition
+            if (!cell.IsVisited && !cell.IsBomb)
+            {
+                allNonBombsVisited = false;
+            }
+
+            // If there exists a cell that is a bomb and
+            // has not been flagged, we know that at least
+            // one cell that is a bomb has not been flagged,
+            // which invalidates one leg of our win condition
+            if (cell.IsBomb && !cell.IsFlagged)
+            {
+                allBombsFlagged = false;
+            }
+
+            // If there exists at least one cell that
+            // has not been visited, we know that there
+            // are more cells to visit, making our
+            // "in progress" condition true
+            if (!cell.IsVisited)
+            {
+                hasUnvisitedCells = true;
+            }
+            
+        }
+
+        // If every cell that is also a bomb has been
+        // visited, then the game has been won.
+        if (allNonBombsVisited || allBombsFlagged)
+        {
+            return GameState.Won;
+        }
+
+        // If there are more cells to visit,
+        // the game is in-progress.
+        if (hasUnvisitedCells)
+        {
+            return GameState.InProgress;
+        }
+        
+        // If board is set up properly, this statement will never return.
+        return GameState.InProgress;
     }
 
     // Method to be implemented in future milestone
-    public void UseSpecialBonus()
+    public void UseSpecialBonus(int row, int col)
     {
     }
 
