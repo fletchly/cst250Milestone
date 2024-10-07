@@ -15,6 +15,7 @@ public class Board
     public Cell[,] Cells { get; set; }
     public int Difficulty { get; set; }
     public int Rewards { get; set; }
+    private int RewardLimit { get; set; }
     public enum GameState
     {
         PreStart,
@@ -25,7 +26,7 @@ public class Board
     }
     public List<(int, int)> BombLocations { get; set; }
 
-    public Board(int size, int difficulty)
+    public Board(int size, int difficulty, int rewardLimit)
     {
         // Throw an exception if the number of bombs exceeds the total area of the board
         if (difficulty < 1 || difficulty > size * size)
@@ -37,7 +38,8 @@ public class Board
         Size = size;
         Difficulty = difficulty;
         Rewards = 0;
-
+        RewardLimit = rewardLimit;
+        
         Cells = new Cell[size, size];
         BombLocations = new List<(int, int)>();
 
@@ -80,7 +82,7 @@ public class Board
             }
         }
 
-        while (rewardsPlaced < Difficulty / 4)
+        while (rewardsPlaced < RewardLimit)
         {
             row = random.Next(Size);
             column = random.Next(Size);
