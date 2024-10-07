@@ -63,7 +63,7 @@ if (board.DetermineGameState() == Board.GameState.Lost)
 /// <summary>
 ///     Utility class that handles console output/inpuy
 /// </summary>
-internal class Utility
+internal static class Utility
 {
     // Create a dictionary for easy color highlighting based on value
     private static readonly Dictionary<int, ConsoleColor> HighlightLevels = new()
