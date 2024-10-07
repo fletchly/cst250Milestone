@@ -47,19 +47,20 @@ public class Board
             Cells[row, col] = new Cell(row, col);
         
         // Setup bombs
-        SetupBombs();
+        SetupBombsAndRewards();
     }
 
     /// <summary>
     ///     Initialize game board with bombs
     /// </summary>
-    private void SetupBombs()
+    private void SetupBombsAndRewards()
     {
         // Declare and initialize
         var random = new Random();
         var row = -1;
         var column = -1;
         var bombsPlaced = 0;
+        var rewardsPlaced = 0;
 
         while (bombsPlaced < Difficulty)
         {
@@ -76,6 +77,18 @@ public class Board
                 CalculateNeighbors(row, column);
                 BombLocations.Add((row, column));
                 bombsPlaced++;
+            }
+        }
+
+        while (rewardsPlaced < Difficulty / 4)
+        {
+            row = random.Next(Size);
+            column = random.Next(Size);
+
+            if (!Cells[row, column].HasSpecialReward)
+            {
+                Cells[row, column].HasSpecialReward = true;
+                rewardsPlaced++;
             }
         }
     }
@@ -140,7 +153,14 @@ public class Board
             // If a bomb has been visited
             if (cell.IsVisited && cell.IsBomb)
             {
-                return GameState.Lost;
+                if (Rewards > 0)
+                {
+                    Rewards--;
+                }
+                else
+                {
+                    return GameState.Lost;
+                }
             }
             
             // If there exists a cell that is not a bomb and
@@ -189,10 +209,16 @@ public class Board
         // If board is set up properly, this statement will never return.
         return GameState.InProgress;
     }
-
-    // Method to be implemented in future milestone
-    public void UseSpecialBonus(int row, int col)
+    
+    public bool UseSpecialBonus(int row, int col)
     {
+        if (Cells[row, col].HasSpecialReward && Cells[row, col].IsVisited)
+        {
+            Cells[row, col].HasSpecialReward = false;
+            Rewards++;
+            return true;
+        }
+        return false;
     }
 
     // Method to be implemented in future milestone
