@@ -16,7 +16,7 @@ using MinesweeperClassLibrary;
 
 // Declare and initialize
 const bool debug = true; // Flag to set debug mode
-Board board = new Board(4, 3, 1);
+var board = new Board(4, 3, 1);
 Tuple<int, int> selectedCell;
 
 Console.WriteLine("Welcome to Minesweeper!");
@@ -61,12 +61,12 @@ if (board.DetermineGameState() == Board.GameState.Lost)
  */
 
 /// <summary>
-/// Utility class that handles console output/inpuy
+///     Utility class that handles console output/inpuy
 /// </summary>
-class Utility()
+internal class Utility
 {
     // Create a dictionary for easy color highlighting based on value
-    private static Dictionary<int, ConsoleColor> HighlightLevels = new()
+    private static readonly Dictionary<int, ConsoleColor> HighlightLevels = new()
     {
         { 1, ConsoleColor.Blue },
         { 2, ConsoleColor.Green },
@@ -79,7 +79,7 @@ class Utility()
     };
 
     /// <summary>
-    /// Print the current state of the board to the console
+    ///     Print the current state of the board to the console
     /// </summary>
     /// <param name="board"></param>
     public static void PrintBoard(Board board)
@@ -174,7 +174,7 @@ class Utility()
     }
 
     /// <summary>
-    /// Generate a horizontal gridline with respect to size
+    ///     Generate a horizontal gridline with respect to size
     /// </summary>
     /// <param name="size"></param>
     /// <returns></returns>
@@ -193,7 +193,7 @@ class Utility()
     }
 
     /// <summary>
-    /// Show answers for a board
+    ///     Show answers for a board
     /// </summary>
     /// <param name="board"></param>
     public static void ShowAnswerKey(Board board)
@@ -266,7 +266,7 @@ class Utility()
     }
 
     /// <summary>
-    /// Utility method to get input with prompt
+    ///     Utility method to get input with prompt
     /// </summary>
     /// <param name="prompt"></param>
     /// <returns></returns>
@@ -277,7 +277,7 @@ class Utility()
         input = Console.ReadLine();
 
         // Ensure input is not null or empty
-        while (String.IsNullOrEmpty(input))
+        while (string.IsNullOrEmpty(input))
         {
             Console.WriteLine("Input cannot be null");
             Console.WriteLine(prompt);
@@ -288,7 +288,7 @@ class Utility()
     }
 
     /// <summary>
-    /// Get row and column from the user and return as tuple
+    ///     Get row and column from the user and return as tuple
     /// </summary>
     /// <param name="board"></param>
     /// <returns></returns>
@@ -325,7 +325,7 @@ class Utility()
     }
 
     /// <summary>
-    /// Method to take action on cells.
+    ///     Method to take action on cells.
     /// </summary>
     /// <param name="board"></param>
     /// <param name="location"></param>

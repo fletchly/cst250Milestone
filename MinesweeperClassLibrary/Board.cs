@@ -9,13 +9,6 @@ namespace MinesweeperClassLibrary;
 
 public class Board
 {
-    public int Size { get; set; }
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
-    public Cell[,] Cells { get; set; }
-    public int Difficulty { get; set; }
-    public int Rewards { get; set; }
-    private int RewardLimit { get; set; }
     public enum GameState
     {
         PreStart,
@@ -24,33 +17,44 @@ public class Board
         Won,
         Lost
     }
-    public List<(int, int)> BombLocations { get; set; }
 
     public Board(int size, int difficulty, int rewardLimit)
     {
         // Throw an exception if the number of bombs exceeds the total area of the board
         if (difficulty < 1 || difficulty > size * size)
         {
-            throw new ArgumentOutOfRangeException(nameof(difficulty), message: "The difficulty must be between 1 and " + size * size + ".");
+            throw new ArgumentOutOfRangeException(nameof(difficulty),
+                "The difficulty must be between 1 and " + size * size + ".");
         }
-        
+
         // Initialize Size and Board
         Size = size;
         Difficulty = difficulty;
         Rewards = 0;
         RewardLimit = rewardLimit;
-        
+
         Cells = new Cell[size, size];
         BombLocations = new List<(int, int)>();
 
         // Load Board with Cells
-        for (var row = 0; row < Size; row++)
-        for (var col = 0; col < Size; col++)
+        for (int row = 0; row < Size; row++)
+        for (int col = 0; col < Size; col++)
+        {
             Cells[row, col] = new Cell(row, col);
-        
+        }
+
         // Setup bombs
         SetupBombsAndRewards();
     }
+
+    public int Size { get; set; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public Cell[,] Cells { get; set; }
+    public int Difficulty { get; set; }
+    public int Rewards { get; set; }
+    private int RewardLimit { get; }
+    public List<(int, int)> BombLocations { get; set; }
 
     /// <summary>
     ///     Initialize game board with bombs
@@ -59,10 +63,10 @@ public class Board
     {
         // Declare and initialize
         var random = new Random();
-        var row = -1;
-        var column = -1;
-        var bombsPlaced = 0;
-        var rewardsPlaced = 0;
+        int row = -1;
+        int column = -1;
+        int bombsPlaced = 0;
+        int rewardsPlaced = 0;
 
         while (bombsPlaced < Difficulty)
         {
@@ -103,8 +107,8 @@ public class Board
     private void CalculateNeighbors(int row, int column)
     {
         // Declare and initialize
-        var currentRow = 0;
-        var currentCol = 0;
+        int currentRow = 0;
+        int currentCol = 0;
 
         // Represents all possible locations of neighboring cells, relative to the current cell.
         // The first array represents the row, and the second represents the column
@@ -115,7 +119,7 @@ public class Board
         };
 
         // Increment the 'neighbors' value for each neighboring cell
-        for (var neighbor = 0; neighbor < 8; neighbor++)
+        for (int neighbor = 0; neighbor < 8; neighbor++)
         {
             currentRow = row + neighborLocations[0, neighbor];
             currentCol = column + neighborLocations[1, neighbor];
@@ -136,9 +140,9 @@ public class Board
     {
         return row >= 0 && column >= 0 && row < Size && column < Size;
     }
-    
+
     /// <summary>
-    /// Determine the state of game and return it.
+    ///     Determine the state of game and return it.
     /// </summary>
     /// <returns></returns>
     public GameState DetermineGameState()
@@ -147,8 +151,8 @@ public class Board
         bool allNonBombsVisited = true; // Assume that all non bombs have been visited by default
         bool allBombsFlagged = true; // Assume that all bombs have been flagged by default
         bool hasUnvisitedCells = false; // Assume that all cells have been visited by default
-        
-        
+
+
         // Iterate over every cell in the board
         foreach (var cell in Cells)
         {
@@ -164,7 +168,7 @@ public class Board
                     return GameState.Lost;
                 }
             }
-            
+
             // If there exists a cell that is not a bomb and
             // has not been visited, we know that all
             // non-bombs have not been visited, which invalidates
@@ -191,7 +195,7 @@ public class Board
             {
                 hasUnvisitedCells = true;
             }
-            
+
         }
 
         // If every cell that is also a bomb has been
@@ -207,11 +211,11 @@ public class Board
         {
             return GameState.InProgress;
         }
-        
+
         // If board is set up properly, this statement will never return.
         return GameState.InProgress;
     }
-    
+
     public bool UseSpecialBonus(int row, int col)
     {
         if (Cells[row, col].HasSpecialReward && Cells[row, col].IsVisited)
@@ -220,6 +224,7 @@ public class Board
             Rewards++;
             return true;
         }
+
         return false;
     }
 

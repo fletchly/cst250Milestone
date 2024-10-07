@@ -12,15 +12,6 @@ namespace MinesweeperClassLibrary;
 /// </summary>
 public class Cell
 {
-    // Class level properties
-    public int Row { get; set; } // Vertical location on the game board
-    public int Column { get; set; } // Horizontal location on the game board
-    public bool IsVisited { get; set; } // Indicates if the cell has been uncovered or not
-    public bool IsBomb { get; set; } // Determines if the cell is a bomb or not
-    public bool IsFlagged { get; set; } // Determines if the cell has been flagged
-    public int Neighbors { get; set; } // The number of neighboring cells with a bomb
-    public bool HasSpecialReward { get; set; } // Determines if the cell contains a special reward
-    
     /// <summary>
     ///     Default constructor
     /// </summary>
@@ -50,4 +41,13 @@ public class Cell
         Neighbors = 0;
         HasSpecialReward = false;
     }
+
+    // Class level properties
+    public int Row { get; set; } // Vertical location on the game board
+    public int Column { get; set; } // Horizontal location on the game board
+    public bool IsVisited { get; set; } // Indicates if the cell has been uncovered or not
+    public bool IsBomb { get; set; } // Determines if the cell is a bomb or not
+    public bool IsFlagged { get; set; } // Determines if the cell has been flagged
+    public int Neighbors { get; set; } // The number of neighboring cells with a bomb
+    public bool HasSpecialReward { get; set; } // Determines if the cell contains a special reward
 }
