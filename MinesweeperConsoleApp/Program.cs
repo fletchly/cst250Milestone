@@ -16,22 +16,28 @@ using MinesweeperClassLibrary;
 
 // Declare and initialize
 const bool debug = true; // Flag to set debug mode
-var board = new Board(4, 3, 1);
+var board = new Board(16, 40, 1);
 Tuple<int, int> selectedCell;
 
 Console.WriteLine("Welcome to Minesweeper!");
 
-// If debugging is enabled, show the answers
-if (debug)
-{
-    Console.WriteLine("[Debugging on] Answer Key:");
-    Utility.ShowAnswerKey(board);
-    Console.WriteLine();
-}
+// Initialize board after user selects starting location
+// so the user doesn't select a bomb on first pick
+Utility.PrintBoard(board);
+selectedCell = Utility.GetRowColLocation(board);
+board.InitializeBoard(selectedCell.Item1, selectedCell.Item2);
 
 // Main game loop
 while (board.DetermineGameState() == Board.GameState.InProgress)
 {
+    // If debugging is enabled, show the answers
+    if (debug)
+    {
+        Console.WriteLine("[Debugging on] Answer Key:");
+        Utility.ShowAnswerKey(board);
+        Console.WriteLine();
+    }
+    
     Utility.PrintBoard(board);
     selectedCell = Utility.GetRowColLocation(board);
 
@@ -130,7 +136,7 @@ internal static class Utility
                         // Cell has no bomb neighbors
                         else if (board.Cells[row, col].Neighbors == 0)
                         {
-                            Console.Write(".");
+                            Console.Write(" ");
                         }
                         // Cell has bomb neighbors
                         else
@@ -338,7 +344,7 @@ internal static class Utility
         {
             // Mark a cell as visited
             case "visit":
-                board.Cells[location.Item1, location.Item2].IsVisited = true;
+                board.Visit(location.Item1, location.Item2);
                 break;
             // Flag a cell
             case "flag":
@@ -347,14 +353,9 @@ internal static class Utility
             // Use/collect a reward
             case "use":
                 // Only allow a bonus to be collected if it exists and has been uncovered
-                if (board.UseSpecialBonus(location.Item1, location.Item2))
-                {
-                    Console.WriteLine($"You collected a bomb defuse kit! You now have {board.Rewards}.");
-                }
-                else
-                {
-                    Console.WriteLine("There is no reward here");
-                }
+                Console.WriteLine(board.UseSpecialBonus(location.Item1, location.Item2)
+                    ? $"You collected a bomb defuse kit! You now have {board.Rewards}."
+                    : "There is no reward here");
 
                 break;
             default:

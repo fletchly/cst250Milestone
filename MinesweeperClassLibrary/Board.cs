@@ -42,9 +42,6 @@ public class Board
         {
             Cells[row, col] = new Cell(row, col);
         }
-
-        // Setup bombs
-        SetupBombsAndRewards();
     }
 
     public int Size { get; set; }
@@ -56,10 +53,17 @@ public class Board
     private int RewardLimit { get; }
     public List<(int, int)> BombLocations { get; set; }
 
+
+    public void InitializeBoard(int startRow, int startCol)
+    {
+        SetupBombsAndRewards(startRow, startCol);
+        FloodFill(startRow, startCol);
+    }
+    
     /// <summary>
     ///     Initialize game board with bombs
     /// </summary>
-    private void SetupBombsAndRewards()
+    private void SetupBombsAndRewards(int startRow, int startCol)
     {
         // Declare and initialize
         var random = new Random();
@@ -74,12 +78,14 @@ public class Board
             row = random.Next(Size);
             column = random.Next(Size);
 
-            // If a bomb does not exist in the current location, create one
+            // If a bomb does not exist in the current location and
+            // the location is not the starting location, create one
             // and increment the counter. Otherwise, do not increment the
             // counter and attempt to place again.
-            if (!Cells[row, column].IsBomb)
+            if (!Cells[row, column].IsBomb && row != startRow && column != startCol)
             {
                 Cells[row, column].IsBomb = true;
+                Cells[row, column].Neighbors = 9;
                 CalculateNeighbors(row, column);
                 BombLocations.Add((row, column));
                 bombsPlaced++;
@@ -141,7 +147,7 @@ public class Board
     /// <param name="row"></param>
     /// <param name="column"></param>
     /// <returns></returns>
-    public bool CellIsOnBoard(int row, int column)
+    private bool CellIsOnBoard(int row, int column)
     {
         return row >= 0 && column >= 0 && row < Size && column < Size;
     }
@@ -222,7 +228,7 @@ public class Board
     }
 
     /// <summary>
-    /// Method to control how rewards are colelcted
+    /// Method to control how rewards are collected
     /// </summary>
     /// <param name="row"></param>
     /// <param name="col"></param>
@@ -237,6 +243,59 @@ public class Board
             return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// Method to determine how cells should be filled
+    /// </summary>
+    /// <param name="row"></param>
+    /// <param name="col"></param>
+    public void Visit(int row, int col)
+    {
+        // In traditional minesweeper, Flood Fill is only used if the selected
+        // cell has no neighboring bombs. Otherwise, only the selected cell is
+        // marked as visited.
+        if (Cells[row, col].Neighbors == 0)
+        {
+            FloodFill(row, col);
+        }
+        else
+        {
+            Cells[row, col].IsVisited = true;
+        }
+    }
+
+    /// <summary>
+    /// Recursive method to mark empty cells as visited
+    /// </summary>
+    /// <param name="row"></param>
+    /// <param name="col"></param>
+    private void FloodFill(int row, int col)
+    {
+        // If the cell is not on the board, do nothing.
+        if (!CellIsOnBoard(row, col)) return;
+        
+        // If the cell is not visited, has zero bomb neighbors, and is not flagged,
+        // then mark it as visited and continue the flood fill path
+        if (!Cells[row, col].IsVisited && Cells[row, col].Neighbors == 0 && !Cells[row, col].IsFlagged)
+        {
+            Cells[row, col].IsVisited = true;
+                
+            FloodFill(row + 1, col);
+            FloodFill(row - 1, col);
+            FloodFill(row, col + 1);
+            FloodFill(row, col - 1);
+            FloodFill(row + 1, col + 1);
+            FloodFill(row - 1, col - 1);
+            FloodFill(row + 1, col - 1);
+            FloodFill(row - 1, col + 1);
+        }
+        // Otherwise, if the cell has more than one neighbor and is not a bomb,
+        // then mark is as visited and terminate the flood fill path
+        else if (Cells[row, col].Neighbors != 0 && !Cells[row, col].IsBomb)
+        {
+            Cells[row, col].IsVisited = true;
+        }
     }
 
     // Method to be implemented in future milestone
