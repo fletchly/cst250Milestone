@@ -79,10 +79,10 @@ public class Board
             column = random.Next(Size);
 
             // If a bomb does not exist in the current location and
-            // the location is not the starting location, create one
+            // the location is not in the starting location "safe zone", create one
             // and increment the counter. Otherwise, do not increment the
             // counter and attempt to place again.
-            if (!Cells[row, column].IsBomb && row != startRow && column != startCol)
+            if (!Cells[row, column].IsBomb && !SafeZone(row, column, startRow, startCol))
             {
                 Cells[row, column].IsBomb = true;
                 Cells[row, column].Neighbors = 9;
@@ -91,6 +91,7 @@ public class Board
                 bombsPlaced++;
             }
         }
+        
         
         while (rewardsPlaced < RewardLimit)
         {
@@ -110,6 +111,25 @@ public class Board
         }
     }
 
+    /// <summary>
+    /// Calculate a safe zone around starting cell to ensure a bomb is not placed
+    /// on the starting cell or withing 1 cell distance from it in all directions
+    /// </summary>
+    /// <param name="row"></param>
+    /// <param name="column"></param>
+    /// <param name="startRow"></param>
+    /// <param name="startCol"></param>
+    /// <returns></returns>
+    private bool SafeZone(int row, int column, int startRow, int startCol)
+    {
+        // Calculate the difference in rows and columns
+        int rowDiff = Math.Abs(startRow - row);
+        int colDiff = Math.Abs(startCol - column);
+
+        // If both differences are <= 1, the cell is either the same or within one cell
+        return rowDiff <= 1 && colDiff <= 1;
+    }
+    
     /// <summary>
     ///     Update cells surrounding a bomb.
     /// </summary>
@@ -139,7 +159,6 @@ public class Board
             if (CellIsOnBoard(currentRow, currentCol)) Cells[currentRow, currentCol].Neighbors++;
         }
     }
-
 
     /// <summary>
     ///     Determine if cell is on board
