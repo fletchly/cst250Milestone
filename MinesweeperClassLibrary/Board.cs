@@ -59,7 +59,7 @@ public class Board
         SetupBombsAndRewards(startRow, startCol);
         FloodFill(startRow, startCol);
     }
-    
+
     /// <summary>
     ///     Initialize game board with bombs
     /// </summary>
@@ -91,8 +91,8 @@ public class Board
                 bombsPlaced++;
             }
         }
-        
-        
+
+
         while (rewardsPlaced < RewardLimit)
         {
             // Get a random location on the board
@@ -103,7 +103,7 @@ public class Board
             // the current cell is not a bomb, create a reward
             // and increment the counter. Otherwise, do not increment the
             // counter and attempt to place again.
-            if (!Cells[row, column].HasSpecialReward && !Cells[row,column].IsBomb)
+            if (!Cells[row, column].HasSpecialReward && !Cells[row, column].IsBomb)
             {
                 Cells[row, column].HasSpecialReward = true;
                 rewardsPlaced++;
@@ -112,8 +112,8 @@ public class Board
     }
 
     /// <summary>
-    /// Calculate a safe zone around starting cell to ensure a bomb is not placed
-    /// on the starting cell or withing 1 cell distance from it in all directions
+    ///     Calculate a safe zone around starting cell to ensure a bomb is not placed
+    ///     on the starting cell or withing 1 cell distance from it in all directions
     /// </summary>
     /// <param name="row"></param>
     /// <param name="column"></param>
@@ -129,7 +129,7 @@ public class Board
         // If both differences are <= 1, the cell is either the same or within one cell
         return rowDiff <= 1 && colDiff <= 1;
     }
-    
+
     /// <summary>
     ///     Update cells surrounding a bomb.
     /// </summary>
@@ -247,7 +247,7 @@ public class Board
     }
 
     /// <summary>
-    /// Method to control how rewards are collected
+    ///     Method to control how rewards are collected
     /// </summary>
     /// <param name="row"></param>
     /// <param name="col"></param>
@@ -261,11 +261,12 @@ public class Board
             Rewards++;
             return true;
         }
+
         return false;
     }
 
     /// <summary>
-    /// Method to determine how cells should be filled
+    ///     Method to determine how cells should be filled
     /// </summary>
     /// <param name="row"></param>
     /// <param name="col"></param>
@@ -285,7 +286,7 @@ public class Board
     }
 
     /// <summary>
-    /// Recursive method to mark empty cells as visited
+    ///     Recursive method to mark empty cells as visited
     /// </summary>
     /// <param name="row"></param>
     /// <param name="col"></param>
@@ -293,13 +294,14 @@ public class Board
     {
         // If the cell is not on the board, do nothing.
         if (!CellIsOnBoard(row, col)) return;
-        
+
         // If the cell is not visited, has zero bomb neighbors, and is not flagged,
         // then mark it as visited and continue the flood fill path
         if (!Cells[row, col].IsVisited && Cells[row, col].Neighbors == 0 && !Cells[row, col].IsFlagged)
         {
             Cells[row, col].IsVisited = true;
-                
+
+            // Flood fill in all directions
             FloodFill(row + 1, col);
             FloodFill(row - 1, col);
             FloodFill(row, col + 1);

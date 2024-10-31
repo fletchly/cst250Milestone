@@ -8,16 +8,16 @@
 using System.Text;
 using MinesweeperClassLibrary;
 
+// Declare and initialize
+const bool debug = true; // Flag to set debug mode
+var board = new Board(16, 40, 1);
+Tuple<int, int> selectedCell;
+
 /*
  * -------------------------------------------------------------
  * Main method start
  * -------------------------------------------------------------
  */
-
-// Declare and initialize
-const bool debug = true; // Flag to set debug mode
-var board = new Board(16, 40, 1);
-Tuple<int, int> selectedCell;
 
 Console.WriteLine("Welcome to Minesweeper!");
 
@@ -37,7 +37,7 @@ while (board.DetermineGameState() == Board.GameState.InProgress)
         Utility.ShowAnswerKey(board);
         Console.WriteLine();
     }
-    
+
     Utility.PrintBoard(board);
     selectedCell = Utility.GetRowColLocation(board);
 
@@ -67,7 +67,7 @@ if (board.DetermineGameState() == Board.GameState.Lost)
  */
 
 /// <summary>
-///     Utility class that handles console output/inpuy
+///     Utility class that handles console output/input
 /// </summary>
 internal static class Utility
 {
