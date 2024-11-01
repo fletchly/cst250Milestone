@@ -20,11 +20,14 @@ public class Board
 
     public Board(int size, int difficulty, int rewardLimit)
     {
-        // Throw an exception if the number of bombs exceeds the total area of the board
-        if (difficulty < 1 || difficulty > size * size)
+        // Throw an exception if the number of bombs exceeds the result of the expression
+        // (size - 1)^2
+        var maxDifficulty = Math.Pow(size - 1, 2);
+
+        if (difficulty < 1 || difficulty >= maxDifficulty)
         {
             throw new ArgumentOutOfRangeException(nameof(difficulty),
-                "The difficulty must be between 1 and " + size * size + ".");
+                "The difficulty must be between 1 and " + maxDifficulty + ".");
         }
 
         // Initialize Size and Board
