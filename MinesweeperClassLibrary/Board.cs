@@ -35,6 +35,7 @@ public class Board
         Difficulty = difficulty;
         Rewards = 0;
         RewardLimit = rewardLimit;
+        PreStart = true;
 
         Cells = new Cell[size, size];
         BombLocations = new List<(int, int)>();
@@ -55,10 +56,12 @@ public class Board
     public int Rewards { get; set; }
     private int RewardLimit { get; }
     public List<(int, int)> BombLocations { get; set; }
+    private bool PreStart { get; set; }
 
 
     public void InitializeBoard(int startRow, int startCol)
     {
+        PreStart = false;
         SetupBombsAndRewards(startRow, startCol);
         FloodFill(startRow, startCol);
     }
@@ -185,6 +188,11 @@ public class Board
         bool allBombsFlagged = true; // Assume that all bombs have been flagged by default
         bool hasUnvisitedCells = false; // Assume that all cells have been visited by default
 
+        // If the board has not yet been fully initialized, the game is in PreStart
+        if (PreStart)
+        {
+            return GameState.PreStart;
+        }
 
         // Iterate over every cell in the board
         foreach (var cell in Cells)
