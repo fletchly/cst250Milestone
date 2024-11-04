@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MinesweeperGui"
         mc:Ignorable="d"
-        Title="Minesweeper" Height="450" Width="800">
+        Title="Minesweeper" Height="562" Width="800">
     <Grid>
-        <Button x:Name="BtnNewGame" Content="New Game" HorizontalAlignment="Left" Height="27" Margin="10,10,0,0" VerticalAlignment="Top" Width="74" Click="BtnNewGameClick"/>
+        <Button x:Name="BtnNewGame" Content="New Game" HorizontalAlignment="Left" Height="27" Margin="609,10,0,0" VerticalAlignment="Top" Width="74" Click="BtnNewGameClick"/>
+        <Grid x:Name="GrdBoard" HorizontalAlignment="Left" Height="526" Margin="10,0,0,0" VerticalAlignment="Center" Width="526" Cursor="Help"/>
 
     </Grid>
 </Window>

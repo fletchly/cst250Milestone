@@ -24,7 +24,7 @@ public class Board
         // (size - 1)^2
         var maxDifficulty = Math.Pow(size - 1, 2);
 
-        if (difficulty < 1 || difficulty >= maxDifficulty)
+        if (difficulty < 1 || difficulty > maxDifficulty)
         {
             throw new ArgumentOutOfRangeException(nameof(difficulty),
                 "The difficulty must be between 1 and " + maxDifficulty + ".");
