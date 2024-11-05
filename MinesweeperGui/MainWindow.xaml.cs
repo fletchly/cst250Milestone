@@ -28,6 +28,21 @@ namespace MinesweeperGui
         TimeSpan GameTime;
 
         /// <summary>
+        /// Dictionary for highlighting colors
+        /// </summary>
+        private static readonly Dictionary<int, Color> HighlightLevels = new()
+        {
+            { 1, Color.FromRgb(25, 41, 250) },
+            { 2, Color.FromRgb(72, 127, 30) },
+            { 3, Color.FromRgb(251, 0, 6) },
+            { 4, Color.FromRgb(0, 0, 109) },
+            { 5, Color.FromRgb(107, 0, 1)},
+            { 6, Color.FromRgb(14, 110, 109) },
+            { 7, Color.FromRgb(0, 0, 0) },
+            { 8, Color.FromRgb(109, 109, 109) }
+        };
+
+        /// <summary>
         /// Default constructor
         /// </summary>
         public MainWindow()
@@ -109,6 +124,8 @@ namespace MinesweeperGui
             // Iterate over each button that needs updating
             foreach (Button button in GrdBoard.Children)
             {
+                button.Foreground = new SolidColorBrush(Color.FromRgb(0, 0, 0));
+
                 row = Grid.GetRow(button); col = Grid.GetColumn(button);
                 currentCell = Board.Cells[row, col];
 
@@ -120,7 +137,10 @@ namespace MinesweeperGui
                     // Cell is a bomb
                     if (currentCell.IsBomb)
                     {
-                        button.Content = "B";
+                        button.Content = new Image
+                        {
+                            Source = new BitmapImage(new Uri("/Icons/mine.png", UriKind.RelativeOrAbsolute))
+                        };
                     }
                     // Cell is not a bomb
                     else
@@ -128,7 +148,10 @@ namespace MinesweeperGui
                         // Cell has special reward
                         if (currentCell.HasSpecialReward)
                         {
-                            button.Content = "R";
+                            button.Content = new Image
+                            {
+                                Source = new BitmapImage(new Uri("/Icons/reward.png", UriKind.RelativeOrAbsolute))
+                            };
                             button.IsEnabled = true;
                         }
                         // Cell has no bomb neighbors
@@ -139,6 +162,7 @@ namespace MinesweeperGui
                         // Cell has bomb neighbors
                         else
                         {
+                            button.Foreground = new SolidColorBrush(HighlightLevels[currentCell.Neighbors]);
                             button.Content = $"{currentCell.Neighbors}";
                         }
                     }
@@ -149,7 +173,10 @@ namespace MinesweeperGui
                     // Cell has been flagged
                     if (currentCell.IsFlagged)
                     {
-                        button.Content = "F";
+                        button.Content = new Image
+                        {
+                            Source = new BitmapImage(new Uri("/Icons/flag.png", UriKind.RelativeOrAbsolute))
+                        };
                     }
                     // Cell has not been flagged
                     else
