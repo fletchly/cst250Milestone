@@ -190,17 +190,20 @@ namespace MinesweeperGui
             if(state == Board.GameState.Lost)
             {
                 Timer.Stop();
-                MessageBox.Show("Game Lost");
+                MessageBox.Show($"Game Lost\nTime: {GameTime.Seconds}s\nRewards: {Board.Rewards}\nFlags: {Board.FlagsLeft}");
                 NewGame();
             }
             else if (state == Board.GameState.Won)
             {
                 Timer.Stop();
-                MessageBox.Show("Game Won");
+                MessageBox.Show($"Game Won\nTime: {GameTime.Seconds}s\nRewards: {Board.Rewards}");
                 NewGame();
             }
         }
 
+        /// <summary>
+        /// Create a new game
+        /// </summary>
         private void NewGame()
         {
             // Show a new setup window as a
