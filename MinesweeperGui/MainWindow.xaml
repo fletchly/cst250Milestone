@@ -5,10 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MinesweeperGui"
         mc:Ignorable="d"
-        Title="Minesweeper" Height="562" Width="800">
+        Title="Minesweeper" Height="604" Width="555" FontFamily="MS UI Gothic" Background="#FF949494" FontWeight="Bold">
     <Grid>
-        <Button x:Name="BtnNewGame" Content="New Game" HorizontalAlignment="Left" Height="27" Margin="609,10,0,0" VerticalAlignment="Top" Width="74" Click="BtnNewGameClick"/>
-        <Grid x:Name="GrdBoard" HorizontalAlignment="Left" Height="526" Margin="10,0,0,0" VerticalAlignment="Center" Width="526" Cursor="Help"/>
+        <Grid x:Name="GrdBoard" HorizontalAlignment="Left" Height="526" Margin="10,52,0,0" VerticalAlignment="Top" Width="526"/>
+        <WrapPanel HorizontalAlignment="Left" Margin="158,10,0,0" Orientation="Horizontal" VerticalAlignment="Top">
+            <Label x:Name="LblRewards" Content="0" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="MS UI Gothic" FontSize="16" FontWeight="Bold" Width="50" HorizontalContentAlignment="Center" Background="#FF5B5B5B" Foreground="#FFFFDE00"/>
+            <Label x:Name="LblMines" Content="0" HorizontalAlignment="Left" VerticalAlignment="Top" Background="#FF5B5B5B" Foreground="Red" FontFamily="MS UI Gothic" FontSize="16" Width="50" HorizontalContentAlignment="Center" FontWeight="Bold"/>
+            <Button x:Name="BtnNewGame" Content="New Game" HorizontalAlignment="Left" Height="27" VerticalAlignment="Top" Width="74" Click="BtnNewGameClick" FontWeight="Bold"/>
+            <Label x:Name="LblTimer" Content="0" HorizontalAlignment="Left" VerticalAlignment="Top" Background="#FF5B5B5B" Foreground="Red" Width="50" FontFamily="MS UI Gothic" FontSize="16" HorizontalContentAlignment="Center" FontWeight="Bold"/>
+        </WrapPanel>
 
     </Grid>
 </Window>

@@ -5,6 +5,8 @@
  * All work is my own
  */
 
+using System.Data;
+
 namespace MinesweeperClassLibrary;
 
 public class Board
@@ -33,6 +35,7 @@ public class Board
         // Initialize Size and Board
         Size = size;
         Difficulty = difficulty;
+        FlagsLeft = difficulty;
         Rewards = 0;
         RewardLimit = rewardLimit;
         PreStart = true;
@@ -57,6 +60,7 @@ public class Board
     private int RewardLimit { get; }
     public List<(int, int)> BombLocations { get; set; }
     private bool PreStart { get; set; }
+    public int FlagsLeft { get; set; }
 
 
     public void InitializeBoard(int startRow, int startCol)
@@ -327,6 +331,27 @@ public class Board
         else if (Cells[row, col].Neighbors != 0 && !Cells[row, col].IsBomb)
         {
             Cells[row, col].IsVisited = true;
+        }
+    }
+
+    /// <summary>
+    /// Flagging behavior implementation
+    /// </summary>
+    /// <param name="row"></param>
+    /// <param name="col"></param>
+    public void ToggleFlag(int row, int col)
+    {
+        // Toggle the IsFlagged flag on selected cell
+        Cells[row, col].IsFlagged = !Cells[row, col].IsFlagged;
+
+        // Modify the number of flags remaining
+        if (Cells[row, col].IsFlagged)
+        {
+            FlagsLeft--;
+        }
+        else
+        {
+            FlagsLeft++;
         }
     }
 

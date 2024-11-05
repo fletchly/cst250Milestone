@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace MinesweeperGui
 {
@@ -20,10 +21,11 @@ namespace MinesweeperGui
     public partial class MainWindow : Window
     {
         // Declare instance variables
-        SetupWindow? setup;
-        Board board;
+        SetupWindow? Setup;
+        Board Board;
         double ButtonSize;
-        Button[,] Buttons;
+        DispatcherTimer Timer;
+        TimeSpan GameTime;
 
         /// <summary>
         /// Default constructor
@@ -31,7 +33,19 @@ namespace MinesweeperGui
         public MainWindow()
         {
             InitializeComponent();
-            board = new Board(16, 40, 1);
+            
+            // Initialize default board
+            Board = new Board(16, 40, 1);
+
+            // Initialize timer
+            Timer = new DispatcherTimer();
+            Timer.Tick += new EventHandler(TimerTick);
+            Timer.Interval = TimeSpan.FromSeconds(1);
+
+            // Initialize TimeSpan
+            GameTime = new TimeSpan();
+
+            // Perform further initialization on game board
             InitializeBoardGrid();
         }
 
@@ -41,11 +55,11 @@ namespace MinesweeperGui
         private void InitializeBoardGrid()
         {
             // Determine button size and ensure board is square
-            ButtonSize = GrdBoard.Width / board.Size;
+            ButtonSize = GrdBoard.Width / Board.Size;
             GrdBoard.Height = GrdBoard.Width;
 
             // Setup board rows and cols
-            for (int size = 0; size < board.Size; size++)
+            for (int size = 0; size < Board.Size; size++)
             {
                 GrdBoard.RowDefinitions.Add(new RowDefinition());
                 GrdBoard.ColumnDefinitions.Add(new ColumnDefinition());
@@ -54,7 +68,7 @@ namespace MinesweeperGui
             }
 
             // Populate board with cells
-            foreach (Cell cell in board.Cells)
+            foreach (Cell cell in Board.Cells)
             {
                 // Create a new button for each cell and align it to the board
                 Button button = new Button();
@@ -70,11 +84,14 @@ namespace MinesweeperGui
 
                 // Subscribe to the cell button event handler
                 button.Click += new RoutedEventHandler(BtnCellClick);
+                button.MouseRightButtonDown += new MouseButtonEventHandler(BtnCellRightClick);
 
                 // Add button to board
                 GrdBoard.Children.Add(button);
                 
             }
+
+            UpdateBoard();
         }
 
         /// <summary>
@@ -84,12 +101,16 @@ namespace MinesweeperGui
         {
             int row, col;
             Cell currentCell;
+            Board.GameState state = Board.DetermineGameState();
+
+            LblMines.Content = Board.FlagsLeft;
+            LblRewards.Content = Board.Rewards;
 
             // Iterate over each button that needs updating
             foreach (Button button in GrdBoard.Children)
             {
                 row = Grid.GetRow(button); col = Grid.GetColumn(button);
-                currentCell = board.Cells[row, col];
+                currentCell = Board.Cells[row, col];
 
                 // If a cell has been visited, disable it and show its contents
                 if (currentCell.IsVisited)
@@ -137,6 +158,37 @@ namespace MinesweeperGui
                     }
                 }
             }
+
+            // Determine game state and create a new game
+            if(state == Board.GameState.Lost)
+            {
+                Timer.Stop();
+                MessageBox.Show("Game Lost");
+                NewGame();
+            }
+            else if (state == Board.GameState.Won)
+            {
+                Timer.Stop();
+                MessageBox.Show("Game Won");
+                NewGame();
+            }
+        }
+
+        private void NewGame()
+        {
+            // Show a new setup window as a
+            // dialog box attached to the main form
+            Setup = new SetupWindow();
+            Setup.Owner = this;
+            Setup.ShowDialog();
+
+            // Refresh the board with new game parameters
+            GrdBoard.Children.Clear();
+            Board = new Board(Setup.Size, Setup.Difficulty, 1);
+            Timer.Stop();
+            GameTime = TimeSpan.Zero;
+            LblTimer.Content = GameTime.Seconds;
+            InitializeBoardGrid();
         }
 
         // Event handlers
@@ -148,16 +200,8 @@ namespace MinesweeperGui
         /// <param name="e"></param>
         private void BtnNewGameClick(object sender, RoutedEventArgs e)
         {
-            // Show a new setup window as a
-            // dialog box attached to the main form
-            setup = new SetupWindow();
-            setup.Owner = this;
-            setup.ShowDialog();
-
-            // Refresh the board with new game parameters
-            GrdBoard.Children.Clear();
-            board = new Board(setup.Size, setup.Difficulty, 1);
-            InitializeBoardGrid();
+            // Call the new game method
+            NewGame();
         }
 
         /// <summary>
@@ -167,18 +211,59 @@ namespace MinesweeperGui
         /// <param name="e"></param>
         private void BtnCellClick(object sender, RoutedEventArgs e)
         {
+            // Cast the sender to a button
             Button clickedButton = (Button) sender;
 
-            if (board.DetermineGameState() == Board.GameState.PreStart)
+            // Collect a special reward if it exists and has been visited
+            if (Board.Cells[Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton)].HasSpecialReward && Board.Cells[Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton)].IsVisited)
             {
-                board.InitializeBoard(Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton));
+                Board.Cells[Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton)].HasSpecialReward = false;
+                Board.Rewards++;
+            }
+
+            // If the board has not been initialized yet (i.e. PreStart),
+            // initialize
+            if (Board.DetermineGameState() == Board.GameState.PreStart)
+            {
+                Board.InitializeBoard(Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton));
+                Timer.Start();
             }
             else
             {
-                board.Visit(Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton));
+                // Only allow a cell to be visited if it is not flagged
+                if (!Board.Cells[Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton)].IsFlagged)
+                {
+                    Board.Visit(Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton));
+                }
             }
 
             UpdateBoard();
+        }
+
+        /// <summary>
+        /// Right click event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnCellRightClick(object sender, RoutedEventArgs e)
+        {
+            Button clickedButton = (Button) sender;
+
+            // Toggle the isFlagged property on the selected cell.
+            Board.ToggleFlag(Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton));
+
+            UpdateBoard();
+        }
+
+        /// <summary>
+        /// Timer tick event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TimerTick(object? sender, EventArgs e)
+        {
+            GameTime += TimeSpan.FromSeconds(1);
+            LblTimer.Content = GameTime.Seconds.ToString();
         }
     }
 }
