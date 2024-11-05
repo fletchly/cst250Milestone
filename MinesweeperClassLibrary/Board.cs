@@ -5,6 +5,8 @@
  * All work is my own
  */
 
+using System.Data;
+
 namespace MinesweeperClassLibrary;
 
 public class Board
@@ -20,18 +22,23 @@ public class Board
 
     public Board(int size, int difficulty, int rewardLimit)
     {
-        // Throw an exception if the number of bombs exceeds the total area of the board
-        if (difficulty < 1 || difficulty > size * size)
+        // Throw an exception if the number of bombs exceeds the result of the expression
+        // (size - 1)^2
+        var maxDifficulty = Math.Pow(size - 1, 2);
+
+        if (difficulty < 1 || difficulty > maxDifficulty)
         {
             throw new ArgumentOutOfRangeException(nameof(difficulty),
-                "The difficulty must be between 1 and " + size * size + ".");
+                "The difficulty must be between 1 and " + maxDifficulty + ".");
         }
 
         // Initialize Size and Board
         Size = size;
         Difficulty = difficulty;
+        FlagsLeft = difficulty;
         Rewards = 0;
         RewardLimit = rewardLimit;
+        PreStart = true;
 
         Cells = new Cell[size, size];
         BombLocations = new List<(int, int)>();
@@ -52,10 +59,13 @@ public class Board
     public int Rewards { get; set; }
     private int RewardLimit { get; }
     public List<(int, int)> BombLocations { get; set; }
+    private bool PreStart { get; set; }
+    public int FlagsLeft { get; set; }
 
 
     public void InitializeBoard(int startRow, int startCol)
     {
+        PreStart = false;
         SetupBombsAndRewards(startRow, startCol);
         FloodFill(startRow, startCol);
     }
@@ -182,6 +192,11 @@ public class Board
         bool allBombsFlagged = true; // Assume that all bombs have been flagged by default
         bool hasUnvisitedCells = false; // Assume that all cells have been visited by default
 
+        // If the board has not yet been fully initialized, the game is in PreStart
+        if (PreStart)
+        {
+            return GameState.PreStart;
+        }
 
         // Iterate over every cell in the board
         foreach (var cell in Cells)
@@ -316,6 +331,27 @@ public class Board
         else if (Cells[row, col].Neighbors != 0 && !Cells[row, col].IsBomb)
         {
             Cells[row, col].IsVisited = true;
+        }
+    }
+
+    /// <summary>
+    /// Flagging behavior implementation
+    /// </summary>
+    /// <param name="row"></param>
+    /// <param name="col"></param>
+    public void ToggleFlag(int row, int col)
+    {
+        // Toggle the IsFlagged flag on selected cell
+        Cells[row, col].IsFlagged = !Cells[row, col].IsFlagged;
+
+        // Modify the number of flags remaining
+        if (Cells[row, col].IsFlagged)
+        {
+            FlagsLeft--;
+        }
+        else
+        {
+            FlagsLeft++;
         }
     }
 

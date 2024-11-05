@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Icons\flag.png" />
+    <None Remove="Icons\mine.png" />
+    <None Remove="Icons\reward.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MinesweeperClassLibrary\MinesweeperClassLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Icons\flag.png" />
+    <Resource Include="Icons\mine.png" />
+    <Resource Include="Icons\reward.png" />
+  </ItemGroup>
+
+</Project>
