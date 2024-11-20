@@ -5,9 +5,7 @@
  * All work is my own
  */
 
-using System.Data;
-
-namespace MinesweeperClassLibrary;
+namespace MinesweeperClassLibrary.Model;
 
 public class Board
 {

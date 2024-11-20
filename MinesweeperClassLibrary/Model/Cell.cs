@@ -5,7 +5,7 @@
  * All work is my own
  */
 
-namespace MinesweeperClassLibrary;
+namespace MinesweeperClassLibrary.Model;
 
 /// <summary>
 ///     Game cell class
