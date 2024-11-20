@@ -12,6 +12,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using MinesweeperClassLibrary.Business;
+using MinesweeperClassLibrary.Model;
 
 namespace MinesweeperGui
 {
@@ -22,6 +24,7 @@ namespace MinesweeperGui
     {
         // Declare instance variables
         SetupWindow? Setup;
+        private BusinessLogic business;
         Board Board;
         double ButtonSize;
         DispatcherTimer Timer;
@@ -49,16 +52,13 @@ namespace MinesweeperGui
         {
             InitializeComponent();
             
-            // Initialize default board
-            Board = new Board(16, 40, 1);
-
+            business = new BusinessLogic();
+            business.SetupDefaultBoard();
+            
             // Initialize timer
             Timer = new DispatcherTimer();
             Timer.Tick += new EventHandler(TimerTick);
             Timer.Interval = TimeSpan.FromSeconds(1);
-
-            // Initialize TimeSpan
-            GameTime = new TimeSpan();
 
             // Perform further initialization on game board
             InitializeBoardGrid();
@@ -70,11 +70,11 @@ namespace MinesweeperGui
         private void InitializeBoardGrid()
         {
             // Determine button size and ensure board is square
-            ButtonSize = GrdBoard.Width / Board.Size;
+            ButtonSize = GrdBoard.Width / business.GetBoardSize();
             GrdBoard.Height = GrdBoard.Width;
 
             // Setup board rows and cols
-            for (int size = 0; size < Board.Size; size++)
+            for (int size = 0; size < business.GetBoardSize(); size++)
             {
                 GrdBoard.RowDefinitions.Add(new RowDefinition());
                 GrdBoard.ColumnDefinitions.Add(new ColumnDefinition());
@@ -83,7 +83,7 @@ namespace MinesweeperGui
             }
 
             // Populate board with cells
-            foreach (Cell cell in Board.Cells)
+            foreach (Cell cell in business.GetBoardCells())
             {
                 // Create a new button for each cell and align it to the board
                 Button button = new Button();
@@ -116,10 +116,10 @@ namespace MinesweeperGui
         {
             int row, col;
             Cell currentCell;
-            Board.GameState state = Board.DetermineGameState();
+            Board.GameState state = business.GetGameState();
 
-            LblMines.Content = Board.FlagsLeft;
-            LblRewards.Content = Board.Rewards;
+            LblMines.Content = business.GetFlags();
+            LblRewards.Content = business.GetRewards();
 
             // Iterate over each button that needs updating
             foreach (Button button in GrdBoard.Children)
@@ -127,7 +127,7 @@ namespace MinesweeperGui
                 button.Foreground = new SolidColorBrush(Color.FromRgb(0, 0, 0));
 
                 row = Grid.GetRow(button); col = Grid.GetColumn(button);
-                currentCell = Board.Cells[row, col];
+                currentCell = business.GetBoardCells()[row, col];
 
                 // If a cell has been visited, disable it and show its contents
                 if (currentCell.IsVisited)
@@ -190,13 +190,13 @@ namespace MinesweeperGui
             if(state == Board.GameState.Lost)
             {
                 Timer.Stop();
-                MessageBox.Show($"Game Lost\nTime: {GameTime.Seconds}s\nRewards: {Board.Rewards}\nFlags: {Board.FlagsLeft}");
+                MessageBox.Show($"Game Lost\nTime: {business.GameTime.Seconds}s\nRewards: {business.GetRewards()}\nFlags: {business.GetFlags()}");
                 NewGame();
             }
             else if (state == Board.GameState.Won)
             {
                 Timer.Stop();
-                MessageBox.Show($"Game Won\nTime: {GameTime.Seconds}s\nRewards: {Board.Rewards}");
+                MessageBox.Show($"Game Won\nTime: {business.GameTime.Seconds}s\nRewards: {business.GetRewards()}");
                 NewGame();
             }
         }
@@ -214,9 +214,8 @@ namespace MinesweeperGui
 
             // Refresh the board with new game parameters
             GrdBoard.Children.Clear();
-            Board = new Board(Setup.Size, Setup.Difficulty, 1);
+            business.NewBoard(Setup.Size, Setup.Difficulty);
             Timer.Stop();
-            GameTime = TimeSpan.Zero;
             LblTimer.Content = GameTime.Seconds;
             InitializeBoardGrid();
         }
@@ -244,27 +243,12 @@ namespace MinesweeperGui
             // Cast the sender to a button
             Button clickedButton = (Button) sender;
 
-            // Collect a special reward if it exists and has been visited
-            if (Board.Cells[Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton)].HasSpecialReward && Board.Cells[Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton)].IsVisited)
+            // Visit the selected cell
+            
+            business.VisitCell(Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton));
+            if (!Timer.IsEnabled)
             {
-                Board.Cells[Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton)].HasSpecialReward = false;
-                Board.Rewards++;
-            }
-
-            // If the board has not been initialized yet (i.e. PreStart),
-            // initialize
-            if (Board.DetermineGameState() == Board.GameState.PreStart)
-            {
-                Board.InitializeBoard(Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton));
                 Timer.Start();
-            }
-            else
-            {
-                // Only allow a cell to be visited if it is not flagged
-                if (!Board.Cells[Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton)].IsFlagged)
-                {
-                    Board.Visit(Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton));
-                }
             }
 
             UpdateBoard();
@@ -280,7 +264,7 @@ namespace MinesweeperGui
             Button clickedButton = (Button) sender;
 
             // Toggle the isFlagged property on the selected cell.
-            Board.ToggleFlag(Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton));
+            business.ToggleFlagOnCell(Grid.GetRow(clickedButton), Grid.GetColumn(clickedButton));
 
             UpdateBoard();
         }
@@ -292,8 +276,8 @@ namespace MinesweeperGui
         /// <param name="e"></param>
         private void TimerTick(object? sender, EventArgs e)
         {
-            GameTime += TimeSpan.FromSeconds(1);
-            LblTimer.Content = GameTime.Seconds.ToString();
+            business.GameTime += TimeSpan.FromSeconds(1);
+            LblTimer.Content = business.GameTime.Seconds.ToString();
         }
     }
 }

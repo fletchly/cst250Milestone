@@ -7,6 +7,7 @@
 
 using System.Text;
 using MinesweeperClassLibrary;
+using MinesweeperClassLibrary.Model;
 
 // Declare and initialize
 const bool debug = true; // Flag to set debug mode

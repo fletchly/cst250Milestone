@@ -225,7 +225,7 @@ public class Board
             // has not been flagged, we know that at least
             // one cell that is a bomb has not been flagged,
             // which invalidates one leg of our win condition
-            if (cell.IsBomb && !cell.IsFlagged)
+            if ((cell.IsBomb && !cell.IsFlagged) || FlagsLeft < 0)
             {
                 allBombsFlagged = false;
             }
@@ -243,7 +243,7 @@ public class Board
 
         // If every cell that is also a bomb has been
         // visited, then the game has been won.
-        if (allNonBombsVisited || allBombsFlagged)
+        if ((allNonBombsVisited || allBombsFlagged))
         {
             return GameState.Won;
         }
