@@ -1,0 +1,14 @@
+﻿<Window x:Class="MinesweeperGui.InputWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MinesweeperGui"
+        mc:Ignorable="d"
+        Title="Enter Name" Height="136" Width="259" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <TextBox x:Name="TxtName" HorizontalAlignment="Center" Margin="0,31,0,0" TextWrapping="Wrap" Text="Enter Name" VerticalAlignment="Top" Width="212"/>
+        <Button x:Name="BtnOk" Content="Ok" HorizontalAlignment="Center" Margin="0,69,0,0" VerticalAlignment="Top" Width="91" Click="BtnOkClick"/>
+
+    </Grid>
+</Window>

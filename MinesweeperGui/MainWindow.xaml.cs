@@ -53,7 +53,7 @@ namespace MinesweeperGui
             InitializeComponent();
             
             business = new BusinessLogic();
-            business.SetupDefaultBoard();
+            business.StartDefaultGame();
             
             // Initialize timer
             Timer = new DispatcherTimer();
@@ -186,17 +186,20 @@ namespace MinesweeperGui
                 }
             }
 
-            // Determine game state and create a new game
-            if(state == Board.GameState.Lost)
+            // End game logic
+            if (state == Board.GameState.Won)
             {
                 Timer.Stop();
-                MessageBox.Show($"Game Lost\nTime: {business.GameTime.Seconds}s\nRewards: {business.GetRewards()}\nFlags: {business.GetFlags()}");
+
+                var scoreboard = new ScoreboardWindow(business.GetTimer(), business.GetRewards(), DateTime.Now, business.GetBoardSize(), business.GetDifficulty());
+
+                scoreboard.Owner = this;
+                scoreboard.ShowDialog();
                 NewGame();
             }
-            else if (state == Board.GameState.Won)
+            else if (state == Board.GameState.Lost)
             {
-                Timer.Stop();
-                MessageBox.Show($"Game Won\nTime: {business.GameTime.Seconds}s\nRewards: {business.GetRewards()}");
+                MessageBox.Show("You lost");
                 NewGame();
             }
         }
@@ -214,9 +217,9 @@ namespace MinesweeperGui
 
             // Refresh the board with new game parameters
             GrdBoard.Children.Clear();
-            business.NewBoard(Setup.Size, Setup.Difficulty);
+            business.StartCustomGame(Setup.Size, Setup.Difficulty);
             Timer.Stop();
-            LblTimer.Content = GameTime.Seconds;
+            LblTimer.Content = business.GetTimer();
             InitializeBoardGrid();
         }
 
@@ -277,7 +280,8 @@ namespace MinesweeperGui
         private void TimerTick(object? sender, EventArgs e)
         {
             business.GameTime += TimeSpan.FromSeconds(1);
-            LblTimer.Content = business.GameTime.Seconds.ToString();
+            business.IncTimer();
+            LblTimer.Content = business.GetTimer();
         }
     }
 }

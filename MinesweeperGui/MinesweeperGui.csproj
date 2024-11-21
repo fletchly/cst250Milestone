@@ -15,6 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ServiceStack.Text" Version="8.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MinesweeperClassLibrary\MinesweeperClassLibrary.csproj" />
   </ItemGroup>
 

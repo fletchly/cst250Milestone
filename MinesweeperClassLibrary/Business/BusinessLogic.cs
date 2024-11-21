@@ -4,10 +4,12 @@ namespace MinesweeperClassLibrary.Business;
 
 public class BusinessLogic
 {
-    private Board _board;
+    private Board _board = new Board(DefaultBoardSize, DefaultDifficulty, DefaultRewardLimit);
     public TimeSpan GameTime { get; set; }
     public bool GameInProgress { get; set; }
-    
+
+    private int _score = 0;
+
     private const int DefaultBoardSize = 16;
     private const int DefaultDifficulty = 40;
     private const int DefaultRewardLimit = 1;
@@ -15,11 +17,12 @@ public class BusinessLogic
     /// <summary>
     /// Setup default board
     /// </summary>
-    public void SetupDefaultBoard()
+    public void StartDefaultGame()
     {
         GameInProgress = false;
         _board = new Board(DefaultBoardSize, DefaultDifficulty, DefaultRewardLimit);
         GameTime = TimeSpan.Zero;
+        _score = 0;
     }
 
     /// <summary>
@@ -27,11 +30,12 @@ public class BusinessLogic
     /// </summary>
     /// <param name="size"></param>
     /// <param name="difficulty"></param>
-    public void NewBoard(int size, int difficulty)
+    public void StartCustomGame(int size, int difficulty)
     {
         GameInProgress = false;
         _board = new Board(size, difficulty, DefaultRewardLimit);
         GameTime = TimeSpan.Zero;
+        _score = 0;
     }
 
     /// <summary>
@@ -116,6 +120,32 @@ public class BusinessLogic
     public int GetRewards()
     {
         return _board.Rewards;
+    }
+
+    /// <summary>
+    /// Get board difficulty
+    /// </summary>
+    /// <returns></returns>
+    public int GetDifficulty()
+    {
+        return _board.Difficulty;
+    }
+
+    /// <summary>
+    /// Increment the score
+    /// </summary>
+    public void IncTimer()
+    {
+        _score++;
+    }
+
+    /// <summary>
+    /// Return the score
+    /// </summary>
+    /// <returns></returns>
+    public int GetTimer()
+    {
+        return _score;
     }
 
 }
