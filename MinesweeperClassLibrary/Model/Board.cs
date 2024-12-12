@@ -204,7 +204,10 @@ public class Board
             {
                 if (Rewards > 0)
                 {
+                    // Flag the cell if reward is present, and decrement rewards
                     Rewards--;
+                    cell.IsVisited = false;
+                    cell.IsFlagged = true;
                 }
                 else
                 {

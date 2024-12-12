@@ -29,6 +29,7 @@ namespace MinesweeperGui
         double ButtonSize;
         DispatcherTimer Timer;
         TimeSpan GameTime;
+        bool darkTheme = false;
 
         /// <summary>
         /// Dictionary for highlighting colors
@@ -282,6 +283,50 @@ namespace MinesweeperGui
             business.GameTime += TimeSpan.FromSeconds(1);
             business.IncTimer();
             LblTimer.Content = business.GetTimer();
+        }
+
+        /// <summary>
+        /// Theme change event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnThemeClick(object sender, RoutedEventArgs e)
+        {
+            if (darkTheme)
+            {
+                // If dark theme is applied, reset theme to default/light
+                darkTheme = false;
+
+                GrdMain.ClearValue(BackgroundProperty);
+
+                foreach (Button button in GrdBoard.Children)
+                {
+                    button.ClearValue(BackgroundProperty);
+                }
+
+                LblMines.ClearValue(BackgroundProperty);
+                LblRewards.ClearValue(BackgroundProperty);
+                LblTimer.ClearValue(BackgroundProperty);
+            }
+            else
+            {
+                // If light theme is applied, switch to dark
+                darkTheme = true;
+
+                GrdMain.Background = new SolidColorBrush(Color.FromRgb(45, 44, 63));
+
+                var scbBackground = new SolidColorBrush(Color.FromRgb(89, 88, 116));
+                foreach (Button button in GrdBoard.Children)
+                {
+                    button.Background = scbBackground;
+                }
+
+                scbBackground = new SolidColorBrush(Color.FromRgb(33, 33, 44));
+
+                LblMines.Background = scbBackground;
+                LblRewards.Background = scbBackground;
+                LblTimer.Background = scbBackground;
+            }
         }
     }
 }

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:MinesweeperGui"
         mc:Ignorable="d"
         Title="Minesweeper" Height="604" Width="555" FontFamily="MS UI Gothic" Background="#FF949494" FontWeight="Bold">
-    <Grid>
+    <Grid x:Name="GrdMain" Background="#FFE3E3E3">
         <Grid x:Name="GrdBoard" HorizontalAlignment="Left" Height="526" Margin="10,52,0,0" VerticalAlignment="Top" Width="526"/>
         <WrapPanel HorizontalAlignment="Left" Margin="158,10,0,0" Orientation="Horizontal" VerticalAlignment="Top">
             <Label x:Name="LblRewards" Content="0" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="MS UI Gothic" FontSize="16" FontWeight="Bold" Width="50" HorizontalContentAlignment="Center" Background="#FF5B5B5B" Foreground="#FFFFDE00"/>
@@ -14,6 +14,7 @@
             <Button x:Name="BtnNewGame" Content="New Game" HorizontalAlignment="Left" Height="27" VerticalAlignment="Top" Width="74" Click="BtnNewGameClick" FontWeight="Bold"/>
             <Label x:Name="LblTimer" Content="0" HorizontalAlignment="Left" VerticalAlignment="Top" Background="#FF5B5B5B" Foreground="Red" Width="50" FontFamily="MS UI Gothic" FontSize="16" HorizontalContentAlignment="Center" FontWeight="Bold"/>
         </WrapPanel>
+        <Button x:Name="BtnTheme" Content="Toggle Theme" HorizontalAlignment="Left" Height="27" Margin="10,10,0,0" VerticalAlignment="Top" Width="89" Click="BtnThemeClick"/>
 
     </Grid>
 </Window>
