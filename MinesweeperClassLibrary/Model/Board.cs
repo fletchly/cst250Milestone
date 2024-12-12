@@ -211,6 +211,7 @@ public class Board
                 }
                 else
                 {
+                    // Otherwise, the game is lost
                     return GameState.Lost;
                 }
             }
